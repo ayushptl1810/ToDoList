@@ -4,7 +4,7 @@
   "scripts": {
     "dev:server": "node index.js",
     "build": "cd ../client && npm run build",
-    "start": "npm run build && node index.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
