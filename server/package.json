@@ -1,12 +1,17 @@
 {
+  "name": "todo-app-server",
+  "version": "1.0.0",
   "scripts": {
-    "start": "node index.js"
+    "dev:server": "node index.js",
+    "build": "cd ../client && npm run build",
+    "start": "npm run build && node index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "mongodb": "^6.15.0",
-    "mongoose": "^8.12.1"
+    "mongoose": "^8.12.1",
+    "path": "^0.12.7"
   }
 }

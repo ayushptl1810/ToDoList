@@ -1,13 +1,15 @@
 ## ToDo List
 
-A minimal full‑stack To‑Do application showcasing a clean CRUD API with a modern client UI. The project is split into a Next.js client and an Express + MongoDB server, designed for clarity, rapid iteration, and easy local replication.
+A minimal full‑stack To‑Do application showcasing a clean CRUD API with a modern client UI. The project is now consolidated into a single service that serves both the Next.js frontend and Express backend from one deployment.
 
 ### Features
 
 - **Create tasks**: Add new to‑dos with a simple form.
 - **List tasks**: View all tasks stored in MongoDB.
 - **Delete tasks**: Remove tasks when done.
+- **Responsive UI**: Styled with modern utility classes.
 - **Animated interactions**: Subtle motion for list items.
+- **Single deployment**: Frontend and backend served from one service.
 
 ### Tech Stack
 
@@ -21,6 +23,7 @@ A minimal full‑stack To‑Do application showcasing a clean CRUD API with a mo
 ToDo List/
   client/        # Next.js application (React UI)
   server/        # Express API (MongoDB via Mongoose)
+  package.json   # Root package.json for single-service management
 ```
 
 ## Prerequisites
@@ -28,7 +31,7 @@ ToDo List/
 - Node.js (LTS recommended)
 - A MongoDB connection string (local or Atlas)
 
-## Quick Start (Local)
+## Quick Start
 
 ### 1) Configure the server
 
@@ -40,65 +43,61 @@ MONGO_URI=<your-mongodb-connection-string>
 # PORT=5001
 ```
 
-### 2) Install dependencies
+### 2) Install all dependencies
 
-From the project root, install client and server dependencies separately:
+From the project root, install all dependencies at once:
 
 ```bash
-cd server && npm install
-cd ../client && npm install
+npm run install:all
 ```
 
-### 3) Run the services
+### 3) Run the application
 
-Open two terminals (one for the API, one for the client):
-
-API (Express):
+#### Development Mode (separate client/server)
 
 ```bash
-cd server
-npm start
-```
-
-Client (Next.js):
-
-```bash
-cd client
 npm run dev
 ```
 
-By default:
+This runs both client and server concurrently:
 
-- API listens at `http://localhost:5001`
-- Client runs at `http://localhost:3000`
+- API at `http://localhost:5001`
+- Client at `http://localhost:3000`
 
-The client expects the API to be reachable at the API’s base URL. If you change the server port or host, you’ll need to align the client’s API base URL accordingly.
+#### Production Mode (single service)
+
+```bash
+npm start
+```
+
+This builds the client and serves everything from the Express server at `http://localhost:5001`
 
 ## Replication Checklist
 
 1. Prepare a MongoDB URI and place it in `server/.env` (`MONGO_URI=...`).
-2. Install dependencies in both `server/` and `client/`.
-3. Start the API first, confirm you see “MongoDB Connected” and the port log.
-4. Start the client and open `http://localhost:3000`.
-5. Create a task, toggle its completion, delete it — verify CRUD works end‑to‑end.
+2. Run `npm run install:all` from the project root.
+3. For development: use `npm run dev` to run both services.
+4. For production: use `npm start` to build and serve everything from one port.
+5. Test CRUD operations end‑to‑end.
 
 ## API Reference
 
-- **Base URL**: `<API_BASE_URL>/api`
+- **Base URL**: `/api` (relative to the server root)
 
-  - Default during local development: `http://localhost:5001/api`
+  - During development: `http://localhost:5001/api`
+  - In production: `/api` (same domain as frontend)
 
 - **Create To‑Do**
 
   - Method: `POST`
-  - Path: `/todos`
+  - Path: `/api/todos`
   - Body:
     ```json
     { "task": "Write documentation" }
     ```
   - Example:
     ```bash
-    curl -X POST "<API_BASE_URL>/api/todos" \
+    curl -X POST "/api/todos" \
       -H "Content-Type: application/json" \
       -d '{"task":"Write documentation"}'
     ```
@@ -106,33 +105,34 @@ The client expects the API to be reachable at the API’s base URL. If you chang
 - **Get All To‑Dos**
 
   - Method: `GET`
-  - Path: `/todos`
+  - Path: `/api/todos`
   - Example:
     ```bash
-    curl "<API_BASE_URL>/api/todos"
+    curl "/api/todos"
     ```
 
 - **Update (toggle/rename) To‑Do**
 
   - Method: `PUT`
-  - Path: `/todos/:id`
+  - Path: `/api/todos/:id`
   - Body (example to toggle):
     ```json
     { "completed": true }
     ```
   - Example:
     ```bash
-    curl -X PUT "<API_BASE_URL>/api/todos/<id>" \
+    curl -X PUT "/api/todos/<id>" \
       -H "Content-Type: application/json" \
       -d '{"completed":true}'
     ```
 
 - **Delete To‑Do**
+
   - Method: `DELETE`
-  - Path: `/todos/:id`
+  - Path: `/api/todos/:id`
   - Example:
     ```bash
-    curl -X DELETE "<API_BASE_URL>/api/todos/<id>"
+    curl -X DELETE "/api/todos/<id>"
     ```
 
 ## Environment Variables
@@ -140,30 +140,45 @@ The client expects the API to be reachable at the API’s base URL. If you chang
 - **Server (`server/.env`)**
   - `MONGO_URI` (required): MongoDB connection string.
   - `PORT` (optional): Port for the Express server. Defaults to `5001`.
-- **Client**
-  - If you plan to externalize the API base URL, you can adopt a variable like `NEXT_PUBLIC_API_BASE_URL` and use it in API calls. This repository currently calls the API directly; align the client’s base URL with your server’s host/port when replicating or deploying.
 
 ## Scripts
 
+- **Root Level**
+
+  - `npm run install:all`: Install dependencies for all packages
+  - `npm run dev`: Run both client and server in development mode
+  - `npm start`: Build client and start production server
+  - `npm run build`: Build the Next.js client for production
+
 - **Server**
-  - `npm start`: start Express API
+
+  - `npm run dev:server`: Start Express API only (development)
+  - `npm start`: Build client and start production server
+
 - **Client**
-  - `npm run dev`: start Next.js dev server
-  - `npm run build`: build for production
-  - `npm start`: start production server (after build)
+  - `npm run dev`: Start Next.js dev server
+  - `npm run build`: Build for production
+  - `npm start`: Start production server (after build)
 
-## Deployment (General Guidance)
+## Deployment (Single Service)
 
-- **API**: Deploy to any Node‑friendly host (e.g., Render, Railway, Fly.io, AWS). Set `MONGO_URI` and optionally `PORT`. Ensure the service exposes the chosen port.
-- **Client**: Deploy to a Next.js host (e.g., Vercel, Netlify with adapters). Align the client’s API base URL with the deployed API’s public URL.
+The application is now designed to deploy as a single service:
+
+1. **Set environment variables**: `MONGO_URI` and optionally `PORT`
+2. **Build and start**: Run `npm start` to build the client and start the server
+3. **Deploy**: Deploy the entire project to any Node.js hosting platform (Render, Railway, Fly.io, AWS, etc.)
+
+The Express server will serve both the API endpoints and the static Next.js frontend from the same port.
 
 ## Troubleshooting
 
 - **MongoDB connection fails**: Verify `MONGO_URI` is correct and accessible from your machine/host.
-- **Port already in use**: Change `PORT` in `server/.env` or stop the process using that port, then align the client’s API base URL to match.
-- **CORS errors**: Ensure the API URL you call matches your running server and that CORS is enabled (it is by default in this server).
+- **Port already in use**: Change `PORT` in `server/.env` or stop the process using that port.
+- **Build fails**: Ensure all dependencies are installed with `npm run install:all`.
+- **Static files not served**: Verify the client build completed successfully and the `client/out` directory exists.
 
 ## Notes
 
 - Keep secrets out of source control. Use environment variables for credentials.
 - For production, consider request validation and stronger error handling.
+- The application now serves as a single service, making deployment simpler and more cost-effective.

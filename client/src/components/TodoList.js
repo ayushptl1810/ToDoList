@@ -5,7 +5,7 @@ import AnimatedContent from "./AnimatedContent";
 const TodoList = ({ todos, fetchTodos }) => {
   const handleToggle = async (id, completed) => {
     try {
-      await axios.put(`http://localhost:5001/api/todos/${id}`, {
+      await axios.put(`/api/todos/${id}`, {
         completed: !completed,
       });
       fetchTodos();
@@ -16,7 +16,7 @@ const TodoList = ({ todos, fetchTodos }) => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5001/api/todos/${id}`);
+      await axios.delete(`/api/todos/${id}`);
       fetchTodos();
     } catch (error) {
       console.error("Error deleting task:", error);

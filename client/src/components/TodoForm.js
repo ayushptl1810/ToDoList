@@ -10,7 +10,7 @@ const TodoForm = ({ fetchTodos }) => {
     if (!task.trim()) return;
 
     try {
-      await axios.post("http://localhost:5001/api/todos", { task });
+      await axios.post("/api/todos", { task });
       setTask("");
       fetchTodos(); // Refresh the list
     } catch (error) {

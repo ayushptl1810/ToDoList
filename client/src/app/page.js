@@ -10,7 +10,7 @@ export default function Home() {
 
   const fetchTodos = useCallback(async () => {
     try {
-      const response = await axios.get("http://localhost:5001/api/todos");
+      const response = await axios.get("/api/todos");
       setTodos(response.data);
     } catch (error) {
       console.error("Error fetching tasks:", error);
